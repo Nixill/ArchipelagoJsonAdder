@@ -1,0 +1,3 @@
+bloonstd6.apworld does *not* have an archipelago.json file
+ufo50.apworld *has* an archipelago.json file that does *not* have an authors key
+manicminers.apworld *has* an archipelago.json file that *has* an authors key

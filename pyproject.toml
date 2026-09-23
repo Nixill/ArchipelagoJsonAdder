@@ -1,0 +1,20 @@
+[project]
+name = "archipelagojsonadder"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Nixill", email = "github@nixill.net" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "nicegui>=3.17.1",
+    "pywebview>=6.2.1",
+]
+
+[project.scripts]
+archipelagojsonadder = "archipelagojsonadder:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
