@@ -35,14 +35,16 @@ def main_page(request: Request) -> None:
 
     if not file:
       file_error.set_content('None').set_visibility(False)
-      file_label.set_content('No file loaded.').set_visibility(True)
+      file_label.set_content('No file loaded.')
       return
 
     file_path = Path(file[0])
+    file_label.set_content(f'Loaded: {file_path.name}')
 
     try:
       apworld_file = zipmanip.open_apworld_file(file_path)
-
+    except FileNotFoundError:
+      file_error.set_content('That file does not exist.')
   
   md("""This tool exists for a **player** to add an archipelago.json to apworlds for compatibility with AP 0.7.0, among other things.
 

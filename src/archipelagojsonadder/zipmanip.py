@@ -3,13 +3,17 @@
     This file exists to do the thing and make the zip file compatable.  I'm told that the data will be coming to me, so I shall trust it is one trusts
     a god.
 """
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Self
-import zipfile
+from zipfile import ZipFile
+from zipfile import Path as ZipPath
 from dataclasses import dataclass
 import os 
 import json
 from pprint import pprint
+
+from archipelagojsonadder.errors import TooManyDirectoriesError
 
 TESTDATA_DIR = 'testdata'
 
@@ -50,7 +54,7 @@ def validate_zip_file(apworld_file: Path) -> bool:
         raise FileNotFoundError
 
     # lemme know if it fails after more rigorous testing
-    with zipfile.ZipFile(apworld_file, mode='r') as zip:
+    with ZipFile(apworld_file, mode='r') as zip:
         # adds all files into list that are stored in the 'world_name' dir
         valid_files = [file for file in zip.infolist() if file.filename.startswith(world_name)]
 
@@ -73,8 +77,30 @@ def validate_zip_file(apworld_file: Path) -> bool:
         
         return APWorldJSONStruct.validate(json.loads(filedata))
 
-def open_apworld_file(apworld_path: Path) -> zipfile.ZipFile:
-    ...
+def open_apworld_file(apworld_path: Path) -> tuple[ZipFile, BytesIO]:
+    if not apworld_path.exists():
+        raise FileNotFoundError('apworld')
+
+    zipdata = BytesIO(apworld_path.read_bytes())
+
+    zipf = ZipFile(zipdata, mode='a')
+    zip_root = ZipPath(zipf)
+    zip_entries = list(zip_root.iterdir())
+
+    if len(zip_entries) == 0:
+        raise FileNotFoundError('ap_dir')
+    elif len(zip_entries) >= 2:
+        raise FileExistsError('multiple')
+
+    world_root = zip_entries[0]
+
+    if not (world_root / '__init__.py').exists():
+        raise FileNotFoundError('__init__.py')
+
+    if (world_root / 'archipelago.json').exists():
+        raise FileExistsError('archipelago.json')
+
+    return zipf, zipdata
 
 if __name__ == '__main__':
     # This is *U G L Y*
